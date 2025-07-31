@@ -1,0 +1,11 @@
+opencv-python
+numpy
+pynput
+Pillow
+matplotlib
+mss
+pyautogui
+torch
+ultralytics
+stable-baselines3
+gym

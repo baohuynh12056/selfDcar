@@ -1,0 +1,43 @@
+# -----------------------
+# Python build & cache
+# -----------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+*.egg
+.pytest_cache/
+
+# -----------------------
+# Virtual environment
+# -----------------------
+.venv/
+venv/
+env/
+
+# -----------------------
+# VS Code settings
+# -----------------------
+.vscode/
+
+# -----------------------
+# Logs
+# -----------------------
+*.log
+
+# -----------------------
+# Model weights & datasets
+# -----------------------
+assets/weights/
+assets/dataset/
+*.pt
+*.onnx
+*.pth
+*.h5
+
+# -----------------------
+# Temporary files
+# -----------------------
+.DS_Store
+Thumbs.db
