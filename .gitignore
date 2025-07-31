@@ -29,8 +29,15 @@ env/
 # -----------------------
 # Model weights & datasets
 # -----------------------
-assets/weights/
-assets/dataset/
+# Ignore all files inside weights/ except .gitkeep
+assets/weights/*
+!assets/weights/.gitkeep
+
+# Ignore all files inside dataset/ except .gitkeep
+assets/dataset/*
+!assets/dataset/.gitkeep
+
+# Ignore model file formats
 *.pt
 *.onnx
 *.pth
