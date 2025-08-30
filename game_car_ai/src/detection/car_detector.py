@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-class CarDetector:
+class MainCarDetector:
     def __init__(self):
         self.lower_yellow = np.array([20, 100, 100])
         self.upper_yellow = np.array([30, 255, 255])
