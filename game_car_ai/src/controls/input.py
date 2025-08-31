@@ -1,14 +1,12 @@
-from pynput.keyboard import Controller, Key
+from pynput.keyboard import Controller
 import time
 
-keyboard = Controller()
-
-def press_left(duration=0.1):
-    keyboard.press(Key.left)
-    time.sleep(duration)
-    keyboard.release(Key.left)
-
-def press_right(duration=0.1):
-    keyboard.press(Key.right)
-    time.sleep(duration)
-    keyboard.release(Key.right)
+class AIController:
+    def __init__(self):
+        self.keyboard = Controller()
+    
+    def press_key(self, key, duration=0.1):
+        """Nhấn phím ảo (trái/phải)"""
+        self.keyboard.press(key)
+        time.sleep(duration)
+        self.keyboard.release(key)
