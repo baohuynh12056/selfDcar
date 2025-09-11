@@ -23,7 +23,7 @@ def train_yolo():
         augment=True,  # Data augmentation
     )
     
-    print("✅ Training completed!")
+    print(" Training completed!")
     return results
 
 if __name__ == "__main__":

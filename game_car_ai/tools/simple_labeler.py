@@ -84,7 +84,7 @@ class SimpleLabeler:
                             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
                 cv2.putText(temp_img, f"Image: {self.current_idx + 1}/{len(self.images)}", (10, 60),
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
-                cv2.putText(temp_img, "0:player_car 1:opponent_car n:next p:prev s:save u:undo c:clear q:quit",
+                cv2.putText(temp_img, "0:player_car 1:opponent_car 2:menu_game n:next p:prev s:save u:undo c:clear q:quit",
                             (10, h - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.4, (255, 255, 255), 1)
 
                 cv2.imshow('Simple Labeler', temp_img)

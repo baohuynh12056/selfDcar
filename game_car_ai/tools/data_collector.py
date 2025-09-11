@@ -10,35 +10,33 @@ class DataCollector:
     def __init__(self, output_dir="game_car_ai/datasets/car_obstacle/images/train"):
         self.output_dir = output_dir
         os.makedirs(self.output_dir, exist_ok=True)
-        # Tạo ScreenCapture với kích thước tối đa 800 để dễ label
-        self.capture = ScreenCapture(max_size=800)
+        self.capture = ScreenCapture()
 
     def start_collection(self, capture_interval=0.5, max_images=500):
-        """Thu thập ảnh từ ScreenCapture"""
+        """Collect images from ScreenCapture"""
         self.capture.start()
-        time.sleep(2)  # chờ cho capture ổn định
+        time.sleep(2)  
 
         count = 0
-        print("Bắt đầu thu thập data... (Nhấn 's' để dừng)")
+        print("Starting data collection... (Press 's' to stop)")
 
         try:
             while count < max_images:
                 frame = self.capture.get_frame_with_timeout(1.0)
                 if frame is None:
-                    print("Không lấy được frame!")
+                    print("Failed to get frame!")
                     continue
 
-                # Scale về [0,255]
                 frame_rgb = frame  
-                # Lưu ảnh với timestamp
+                # Save image with timestamp
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
                 filename = os.path.join(self.output_dir, f"car_{timestamp}.jpg")
                 cv2.imwrite(filename, frame_rgb)
                 count += 1
-                print(f"Đã lưu ảnh {count}/{max_images}: {filename}")
+                print(f"Saved image {count}/{max_images}: {filename}")
 
                 # Preview
-                cv2.imshow("Data Collection - Nhấn S để dừng", frame_rgb)
+                cv2.imshow("Data Collection - Press S to stop", frame_rgb)
 
                 if cv2.waitKey(1) & 0xFF == ord("s"):
                     break
@@ -48,12 +46,12 @@ class DataCollector:
         finally:
             self.capture.stop()
             cv2.destroyAllWindows()
-            print(f"Hoàn thành! Đã thu thập {count} ảnh")
+            print(f"Completed! Collected {count} images")
 
 
 def collect_diverse_data():
     collector = DataCollector()
-    input("Nhấn Enter để bắt đầu...")
+    input("Press Enter to start ...")
     collector.start_collection(capture_interval=0.3, max_images=1000)
 
 
