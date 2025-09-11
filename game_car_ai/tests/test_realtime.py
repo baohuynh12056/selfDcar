@@ -5,7 +5,7 @@ import numpy as np
 from game_car_ai.src.vision.capture import ScreenCapture
 
 def test_realtime_detection():
-    # Load model đã train
+    # Load trained model
     model = YOLO('game_car_ai/assets/weights/car_detector.pt')
     capture = ScreenCapture()
     
@@ -31,9 +31,6 @@ def test_realtime_detection():
                 # Visualize results
                 annotated_frame = results[0].plot()
                 
-                # Hiển thị FPS và thông tin
-                cv2.putText(annotated_frame, f"FPS: {30}", (10, 30), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
                 cv2.putText(annotated_frame, "Press Q to quit", (10, 60), 
                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 1)
                 
@@ -45,7 +42,7 @@ def test_realtime_detection():
                 break
             elif key == ord('s'):
                 cv2.imwrite(f'detection_screenshot_{frame_count}.jpg', annotated_frame)
-                print("📸 Screenshot saved!")
+                print("Screenshot saved!")
                 
     finally:
         capture.stop()
