@@ -13,11 +13,10 @@ class ScreenCapture:
         self.cap = None
         self.proc = None
 
-        # biến đồng bộ
+        # synchronization variable
         self.lock = Lock()
         self.frame = None
         self.running = False
-        print(23)
         self._setup_scrcpy()
 
     def _setup_scrcpy(self):
@@ -27,19 +26,16 @@ class ScreenCapture:
             f"--max-size={self.max_size}",
             f"--v4l2-sink={self.device_path}"
         ]
-        print(25)
         self.proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        print(26)
-        # đợi scrcpy khởi động
-        time.sleep(2)
+        # Wait until scrcpy finishes lauching
+        time.sleep(1)
 
         self.cap = cv2.VideoCapture(self.device_path)
-        print(27)
         if not self.cap.isOpened():
-            raise RuntimeError(f"Không thể mở scrcpy virtual camera tại {self.device_path}")
+            raise RuntimeError(f"Cannot open scrcpy virtual camera at {self.device_path}")
 
     def start(self):
-        """Khởi động luồng đọc frame"""
+        """Start the frame reading thread"""
         self.running = True
         self.thread = Thread(target=self._update_frame, daemon=True)
         self.thread.start()
@@ -52,7 +48,6 @@ class ScreenCapture:
                 rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                 resized = cv2.resize(rgb, (640, 640))
                 
-
                 with self.lock:
                     self.frame = resized
 
@@ -61,7 +56,7 @@ class ScreenCapture:
             return self.frame.copy() if self.frame is not None else None
     
     def get_frame_with_timeout(self, timeout=1.0):
-        """Lấy frame với timeout"""
+        """Take frame with timeout"""
         start_time = time.time()
         while time.time() - start_time < timeout:
             frame = self.get_frame()
