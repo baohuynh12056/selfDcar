@@ -17,7 +17,7 @@ class ScreenCapture:
         self.lock = Lock()
         self.frame = None
         self.running = False
-
+        print(23)
         self._setup_scrcpy()
 
     def _setup_scrcpy(self):
@@ -27,12 +27,14 @@ class ScreenCapture:
             f"--max-size={self.max_size}",
             f"--v4l2-sink={self.device_path}"
         ]
+        print(25)
         self.proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
+        print(26)
         # đợi scrcpy khởi động
         time.sleep(2)
 
         self.cap = cv2.VideoCapture(self.device_path)
+        print(27)
         if not self.cap.isOpened():
             raise RuntimeError(f"Không thể mở scrcpy virtual camera tại {self.device_path}")
 

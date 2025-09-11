@@ -4,7 +4,7 @@ import os
 
 def train_yolo():
     """Train YOLO model"""
-    print("🎯 Training YOLO model...")
+    print("Training YOLO model...")
     
     # Load pretrained model
     model = YOLO('yolov8n.pt')  # YOLOv8 nano

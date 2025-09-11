@@ -15,7 +15,7 @@ def create_data_yaml():
     with open('datasets/car_obstacle/data.yaml', 'w') as f:
         yaml.dump(data, f, default_flow_style=False)
     
-    print("✅ Created data.yaml")
+    print("Created data.yaml")
     print(yaml.dump(data, default_flow_style=False))
 
 create_data_yaml()

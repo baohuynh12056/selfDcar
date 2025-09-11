@@ -6,7 +6,7 @@ from pathlib import Path
 
 def validate_dataset(image_dir, label_dir, class_names):
     """Kiểm tra dataset đã label"""
-    print("🔍 Validating dataset...")
+    print("Validating dataset...")
     
     images = [f for f in os.listdir(image_dir) if f.endswith(('.jpg', '.png'))]
     
@@ -16,12 +16,12 @@ def validate_dataset(image_dir, label_dir, class_names):
         
         # Kiểm tra ảnh tồn tại
         if not os.path.exists(img_path):
-            print(f"❌ Missing image: {img_name}")
+            print(f"Missing image: {img_name}")
             continue
             
         # Kiểm tra label tồn tại
         if not os.path.exists(label_path):
-            print(f"⚠️  Missing label: {img_name}")
+            print(f" Missing label: {img_name}")
             continue
             
         # Kiểm tra label format
@@ -29,11 +29,11 @@ def validate_dataset(image_dir, label_dir, class_names):
             for i, line in enumerate(f):
                 parts = line.strip().split()
                 if len(parts) != 5:
-                    print(f"❌ Invalid label in {img_name}, line {i+1}")
+                    print(f"Invalid label in {img_name}, line {i+1}")
                 
                 class_id = int(parts[0])
                 if class_id >= len(class_names):
-                    print(f"❌ Invalid class ID in {img_name}: {class_id}")
+                    print(f"Invalid class ID in {img_name}: {class_id}")
     
     print("✅ Dataset validation completed!")
 

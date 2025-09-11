@@ -9,14 +9,14 @@ class SimpleLabeler:
         self.label_dir = label_dir
         self.images = self.get_image_list()
         self.current_idx = 0
-        self.classes = ['player_car', 'opponent_car']
+        self.classes = ['player_car', 'opponent_car','menu_game']
         self.current_class = 0
         self.boxes = []  # list of boxes for current image: (class_id, x1, y1, x2, y2)
         self.drawing = False
         self.start_point = None
 
         os.makedirs(label_dir, exist_ok=True)
-        print(f"📁 Found {len(self.images)} images")
+        print(f"Found {len(self.images)} images")
 
     def get_image_list(self):
         images = []
@@ -36,7 +36,7 @@ class SimpleLabeler:
             x1, x2 = sorted([x1, x2])
             y1, y2 = sorted([y1, y2])
             self.boxes.append((self.current_class, x1, y1, x2, y2))
-            print(f"✅ Added box: class={self.classes[self.current_class]}, ({x1},{y1},{x2},{y2})")
+            print(f"Added box: class={self.classes[self.current_class]}, ({x1},{y1},{x2},{y2})")
 
     def save_labels(self, label_path, img_width, img_height):
         """Save boxes in YOLO format"""
@@ -47,10 +47,10 @@ class SimpleLabeler:
                 w = (x2 - x1) / img_width
                 h = (y2 - y1) / img_height
                 f.write(f"{cls_id} {x_center:.6f} {y_center:.6f} {w:.6f} {h:.6f}\n")
-        print(f"💾 Saved {len(self.boxes)} boxes to {label_path}")
+        print(f"Saved {len(self.boxes)} boxes to {label_path}")
 
     def start_labeling(self):
-        print("🎯 Simple Labeling Tool")
+        print("Simple Labeling Tool")
         print("Controls: 0=player_car 1=opponent_car n=next p=prev s=save u=undo c=clear q=quit")
 
         while self.current_idx < len(self.images):
@@ -60,7 +60,7 @@ class SimpleLabeler:
 
             img = cv2.imread(img_path)
             if img is None:
-                print(f"❌ Cannot read: {img_name}")
+                print(f"Cannot read: {img_name}")
                 self.current_idx += 1
                 continue
 
@@ -101,26 +101,29 @@ class SimpleLabeler:
                     break
                 elif key == ord('0'):
                     self.current_class = 0
-                    print("🔵 Selected: player_car")
+                    print("Selected: player_car")
                 elif key == ord('1'):
                     self.current_class = 1
-                    print("🔴 Selected: opponent_car")
+                    print("Selected: opponent_car")
+                elif key == ord('2'):
+                    self.current_class = 2
+                    print("Selected: menu_game")
                 elif key == ord('s'):
                     self.save_labels(label_path, w, h)
                 elif key == ord('u'):  # undo
                     if self.boxes:
                         removed = self.boxes.pop()
-                        print(f"↩️  Removed last box: class={self.classes[removed[0]]}")
+                        print(f"Removed last box: class={self.classes[removed[0]]}")
                 elif key == ord('c'):  # clear all
                     self.boxes = []
-                    print("🧹 Cleared all boxes for this image")
+                    print("Cleared all boxes for this image")
 
         cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
     labeler = SimpleLabeler(
-        image_dir='datasets/car_obstacle/images/train/',
-        label_dir='datasets/car_obstacle/labels/train/'
+        image_dir='game_car_ai/datasets/car_obstacle/images/train/',
+        label_dir='game_car_ai/datasets/car_obstacle/labels/train/'
     )
     labeler.start_labeling()

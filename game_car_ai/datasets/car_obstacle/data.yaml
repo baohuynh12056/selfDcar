@@ -4,4 +4,5 @@ val:  datasets/car_obstacle/images/val
 names:
   0: player_car
   1: opponent_car
-nc: 2
+  2: menu_game
+nc: 3

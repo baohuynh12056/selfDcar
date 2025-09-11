@@ -9,7 +9,7 @@ def test_realtime_detection():
     model = YOLO('game_car_ai/assets/weights/car_detector.pt')
     capture = ScreenCapture()
     
-    print("🎮 Starting real-time detection...")
+    print("Starting real-time detection...")
     print("Press 'Q' to quit, 'S' to save screenshot")
     
     try:
@@ -50,7 +50,7 @@ def test_realtime_detection():
     finally:
         capture.stop()
         cv2.destroyAllWindows()
-        print("✅ Real-time test completed")
+        print("Real-time test completed")
 
 if __name__ == "__main__":
     test_realtime_detection()

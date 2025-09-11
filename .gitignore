@@ -1,50 +1,72 @@
-# -----------------------
-# Python build & cache
-# -----------------------
+# .gitignore
+# Python
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
 *.egg-info/
+.installed.cfg
 *.egg
-.pytest_cache/
+MANIFEST
 
-# -----------------------
 # Virtual environment
-# -----------------------
 .venv/
 venv/
 env/
+ENV/
 
-# -----------------------
-# VS Code settings
-# -----------------------
-.vscode/
+# Dataset files - QUAN TRỌNG: không đẩy dataset
+datasets/*.jpg
+datasets/*.jpeg
+datasets/*.png
+datasets/*.txt
+datasets/*.json
 
-# -----------------------
-# Logs
-# -----------------------
-*.log
-
-# -----------------------
-# Model weights & datasets
-# -----------------------
-# Ignore all files inside weights/ except .gitkeep
-assets/weights/*
-!assets/weights/.gitkeep
-
-# Ignore all files inside dataset/ except .gitkeep
-assets/dataset/*
-!assets/dataset/.gitkeep
-
-# Ignore model file formats
+# Model weights - QUAN TRỌNG: không đẩy weights
 *.pt
-*.onnx
 *.pth
-*.h5
+*.weights
+*.onnx
+*.engine
 
-# -----------------------
-# Temporary files
-# -----------------------
+# Training results
+runs/
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Large files
+*.zip
+*.tar.gz
+*.7z
