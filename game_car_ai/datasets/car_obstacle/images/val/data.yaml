@@ -1,7 +1,0 @@
-names:
-  0: player_car
-  1: opponent_car
-nc: 2
-path: ../datasets/car_obstacle
-train: images/train
-val: images/val
