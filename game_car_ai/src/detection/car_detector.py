@@ -16,7 +16,7 @@ class CarDetector:
             return []
         
         try:
-            # Convert to BGR nếu là grayscale
+            # Convert to BGR if it's grayscale
             if len(frame.shape) == 2:
                 frame_bgr = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
             elif frame.shape[2] == 1:
@@ -49,12 +49,14 @@ class CarDetector:
         
     def visualize(self, frame, detections):
         """
-        Vẽ bounding boxes lên frame
+        Draw bounding boxes on the frame.
+
         Args:
-            frame: Input frame
-            detections: List detections từ detect()
+            frame: Input frame.
+            detections: List of detections from detect().
+
         Returns:
-            Frame với bounding boxes
+            Frame with bounding boxes drawn.
         """
         if frame is None:
             return None
@@ -68,16 +70,16 @@ class CarDetector:
         for det in detections:
             x1, y1, x2, y2 = map(int, det['bbox'])
             
-            # Chọn màu theo class
+            # Choose color by class
             if det['class_name'] == 'player_car':
-                color = (0, 255, 0)  # Xanh lá
+                color = (0, 255, 0)  # Green
             else:
-                color = (0, 0, 255)  # Đỏ
+                color = (0, 0, 255)  # Red
             
-            # Vẽ bounding box
+            # Draw bounding box
             cv2.rectangle(vis_frame, (x1, y1), (x2, y2), color, 2)
             
-            # Vẽ label
+            # Draw label
             label = f"{det['class_name']} {det['confidence']:.2f}"
             cv2.putText(vis_frame, label, (x1, y1-10), 
                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
