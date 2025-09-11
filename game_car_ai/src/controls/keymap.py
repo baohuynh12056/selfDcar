@@ -1,5 +1,4 @@
 # src/controls/keymap.py
-from .new_iput import ScrcpyController
 
 class GameKeyMap:
     def __init__(self, controller):

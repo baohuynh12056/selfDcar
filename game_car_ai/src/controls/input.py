@@ -1,9 +1,13 @@
 # src/controls/input.py
+
 import subprocess
 import threading
 import queue
 import time
 
+
+# Deprecated: This class is no longer used due to ADB command delays,
+# except for the tap function which is still used to restart the game.
 class AndroidController:
     def __init__(self, device_id=None, send_interval=0.15):
         self.device_id = device_id
@@ -11,7 +15,7 @@ class AndroidController:
         self.lock = threading.Lock()
         self.queue = queue.Queue()
         self.running = True
-        self.send_interval = send_interval  # giãn lệnh 150ms
+        self.send_interval = send_interval 
         self.holding = None
         self._open_shell()
         self._start_worker()
@@ -65,7 +69,6 @@ class AndroidController:
         t = threading.Thread(target=self._worker, daemon=True)
         t.start()
 
-    # API
     def tap(self, x, y):
         self.queue.put(("tap", x, y))
 

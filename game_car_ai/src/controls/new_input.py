@@ -1,20 +1,21 @@
-# scrcpy_controller.py
+# src/controls/new_input.py
 import subprocess
 import pyautogui
 import time
 import threading
+
 class ScrcpyController:
     def __init__(self, max_size=640):
         """
-        Khởi chạy scrcpy và điều khiển điện thoại bằng PyAutoGUI
+        Run scrcpy and control the phone using PyAutoGUI
         Args:
-            max_size: resize window scrcpy
+            max_size: resize window scrcpy (option)
         """
         self.max_size = max_size
         self.proc = None
         self.current_action = None
         self._launch_scrcpy()
-        time.sleep(1)  # đợi scrcpy mở xong
+        time.sleep(1)  # Wait until scrcpy finishes lauching
 
     def _launch_scrcpy(self):
         cmd = [
@@ -25,18 +26,18 @@ class ScrcpyController:
 
     def press_key(self, key):
         """
-        Gửi phím vào cửa sổ scrcpy
+        Send keystrokes to the scrcpy window 
         """
-        # PyAutoGUI cần window đang active
         pyautogui.press(key)
 
     def tap(self, x, y):
         """
-        Click chuột vào cửa sổ scrcpy, map tọa độ từ scrcpy window
+        Click inside the scrcpy window and map the coordinates from it
         """
         pyautogui.click(x, y)
+
     def _tap_key_short(self, key, duration=0.1):
-        """Nhấn giữ key trong duration giây rồi nhả"""
+        """Hold a key for duration seconds, then release"""
         pyautogui.keyDown(key)
         time.sleep(duration)
         pyautogui.keyUp(key)
@@ -44,8 +45,9 @@ class ScrcpyController:
     def swipe(self, x1, y1, x2, y2, duration=0.2):
         pyautogui.moveTo(x1, y1)
         pyautogui.dragTo(x2, y2, duration=duration)
+
     def _send_key(self, key):
-        """Nhả phím cũ và nhấn phím mới"""
+        """Release the previous key before pressing the new one"""
         if self.current_action != key:
             self.release()
             pyautogui.keyDown(key)
@@ -59,17 +61,22 @@ class ScrcpyController:
 
 
     def down(self):
+        """
+        Do not use the DOWN key — it makes the car stop or run too slowly during training,
+        which prevents opponent cars from appearing to avoid
+        """
         pass
 
     def noop(self):
-        """Nhả tất cả phím đang giữ"""
         pass
+
     def close(self):
         if self.proc:
             self.proc.terminate()
             self.proc.wait()
+
     def release(self):
-        """Nhả phím đang giữ nếu có"""
+        """Release the currently held key, if present"""
         if self.current_action:
             pyautogui.keyUp(self.current_action)
             self.current_action = None
