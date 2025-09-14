@@ -8,41 +8,21 @@ __pycache__/
 build/
 develop-eggs/
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-pip-wheel-metadata/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+
 
 # Virtual environment
 .venv/
-venv/
-env/
-ENV/
+
 
 # Dataset files - QUAN TRỌNG: không đẩy dataset
-datasets/*.jpg
-datasets/*.jpeg
-datasets/*.png
-datasets/*.txt
-datasets/*.json
+*.jpg
+/game_car_ai/datasets/car_obstacle/labels/train/*.txt
+/game_car_ai/datasets/car_obstacle/labels/val/*.txt
+*.cache
 
 # Model weights - QUAN TRỌNG: không đẩy weights
 *.pt
-*.pth
-*.weights
-*.onnx
-*.engine
+
 
 # Training results
 runs/
@@ -53,18 +33,6 @@ logs/
 .idea/
 *.swp
 *.swo
-
-# OS
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# Jupyter Notebook
-.ipynb_checkpoints
 
 # Large files
 *.zip

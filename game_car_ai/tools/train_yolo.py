@@ -1,6 +1,5 @@
 # tools/train_yolo.py
 from ultralytics import YOLO
-import os
 
 def train_yolo():
     """Train YOLO model"""

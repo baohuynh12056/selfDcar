@@ -1,5 +1,4 @@
 # src/ai/agent.py
-import torch
 import torch.nn as nn
 import numpy as np
 from stable_baselines3 import PPO
@@ -8,55 +7,10 @@ from stable_baselines3.common.callbacks import BaseCallback
 from stable_baselines3.common.monitor import Monitor
 import os
 import gymnasium as gym
-import threading
-import time
-class RenderThread:
-    """Chạy render trong thread riêng"""
-    def __init__(self, env, fps=15):
-        self.env = env
-        self.fps = fps
-        self.stop_event = threading.Event()
-        self.thread = threading.Thread(target=self._render_loop, daemon=True)
 
-    def _render_loop(self):
-        delay = 1.0 / self.fps
-        while not self.stop_event.is_set():
-            try:
-                self.env.render()
-            except Exception as e:
-                print(f"[RenderThread] Error: {e}")
-            time.sleep(delay)  # giữ FPS ổn định
-
-    def start(self):
-        self.thread.start()
-
-    def stop(self):
-        self.stop_event.set()
-        self.thread.join()
-class TensorboardCallback(BaseCallback):
-    """Custom callback for Tensorboard logging"""
-    def __init__(self, verbose=0):
-        super(TensorboardCallback, self).__init__(verbose)
-        self.episode_rewards = []
-        self.episode_lengths = []
-        
-    def _on_step(self) -> bool:
-        return True
-        
-    def _on_rollout_end(self) -> None:
-        # Log training metrics
-        if len(self.model.ep_info_buffer) > 0:
-            episode_info = self.model.ep_info_buffer[-1]
-            if 'r' in episode_info:
-                self.logger.record('train/episode_reward', episode_info['r'])
-            if 'l' in episode_info:
-                self.logger.record('train/episode_length', episode_info['l'])
-        
-        # Log learning rate
-        self.logger.record('train/learning_rate', self.model.learning_rate)
 class SaveBestModelCallback(BaseCallback):
     """
-    Callback tự động lưu model tốt nhất dựa trên 'episode reward'.
+    Callback choosing the best model base on 'episode reward'.
     """
     def __init__(self, save_path, verbose=1):
         super(SaveBestModelCallback, self).__init__(verbose)
@@ -73,10 +27,10 @@ class SaveBestModelCallback(BaseCallback):
                 mean_reward = ep_info['r']
                 if mean_reward > self.best_mean_reward:
                     self.best_mean_reward = mean_reward
-                    save_file = os.path.join('assets/ai_models/ppo_car_agent_1', 'best_model.zip')
+                    save_file = os.path.join('game_car_ai/assets/weights/ppo_car_agent_1', 'best_model.zip')
                     self.model.save(save_file)
                     if self.verbose > 0:
-                        print(f"\n✅ New best model saved with reward {self.best_mean_reward:.2f}")
+                        print(f"\n New best model saved with reward {self.best_mean_reward:.2f}")
         return True  
 class CarAIAgent:
     def __init__(self, policy='MlpPolicy', device='auto'):
@@ -88,20 +42,19 @@ class CarAIAgent:
     def create_env(self, n_stack=4):
         """Create and wrap environment"""
         from game_car_ai.src.env.game_env import CarGameEnv
-        print(19)
         # Create base environment
-        env = CarGameEnv()
+        self.env = CarGameEnv()
         
         # Add monitoring
-        env = Monitor(env)
+        self.env = Monitor(self.env)
         
         # Vectorize environment (required for SB3)
-        env = DummyVecEnv([lambda: env])
+        self.env = DummyVecEnv([lambda: self.env])
 
-        return env
+        return self.env
     
     def create_model(self, env=None):
-        """Create PPO model với MLP policy"""
+        """Create PPO model with MLP policy"""
         if env is None:
             env = self.create_env()
             
@@ -111,7 +64,7 @@ class CarAIAgent:
             verbose=1,
             device=self.device,
             learning_rate=3e-4,
-            n_steps=512,  # Có thể giảm vì observations đơn giản hơn
+            n_steps=512,  
             batch_size=64,
             n_epochs=10,
             gamma=0.99,
@@ -128,7 +81,7 @@ class CarAIAgent:
         return self.model
   
 
-    def train(self, total_timesteps=100000, save_path="assets/ai_models/ppo_car_agent"):
+    def train(self, total_timesteps=100000, save_path="game_car_ai/assets/weights/ppo_car_agent"):
         """Train the AI agent"""
         print("Starting AI agent training...")
         
@@ -163,9 +116,9 @@ class CarAIAgent:
     
     def load(self, path, env=None):
         """Load trained agent"""
-        if env is None:
-            env = self.create_env()
-        
+        if self.env is None:
+            self.env = self.create_env()
+        print(2)
         self.model = PPO.load(path, env=env)
         print(f"Loaded agent from {path}")
         return self.model
@@ -234,7 +187,7 @@ def train_with_hyperparams():
             
             # Train briefly to evaluate
             agent.train(total_timesteps=10000, 
-                       save_path=f"assets/ai_models/ppo_lr{lr}_bs{batch_size}")
+                       save_path=f"game_car_ai/assets/weights/ppo_car_agent/ppo_lr{lr}_bs{batch_size}")
             
             # Evaluate
             reward, steps = agent.run_episode(render=False, max_steps=500)
