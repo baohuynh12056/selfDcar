@@ -13,21 +13,21 @@
 git clone https://github.com/baohuynh12056/selfDcar.git
 cd selfDcar
 ```
-#### 2. Creat a virtual enviroment.
+### 2. Creat a virtual environment.
 If you have not created one yet, run:
 ```bash
 python3 -m venv .venv
 ```
-#### 2. Activate the virtual environment
+### 3. Activate the virtual environment
 ```bash
 source .venv/bin/activate
 ```
-### 2.Install Python dependencies
+### 4.Install Python dependencies
 Make sure you have Python 3.10+ installed, then run:
 ```bash
 pip install -r requirements.txt
 ```
-### 3. Install external dependencies
+### 5. Install external dependencies
 - **scrcpy**: stream and control the Android game *Traffic Racer*
 ```bash
  sudo apt update 
@@ -38,7 +38,7 @@ pip install -r requirements.txt
  sudo apt install v4l2loopback-dkms v4l2loopback-utils
 
 ```
-### 4. Verify installation
+### 6. Verify installation
 Check that scrcpy works:
 ```bash
 scrcpy --version
@@ -55,7 +55,7 @@ modprobe v4l2loopback
 - Verify that the device is detected:
   ```bash
   adb devices
-### 2.Setup virtual camera 
+### 2. Setup virtual camera 
 Use **v4l2loopback** to create a virtual camera device that scrcpy can stream into:
 ```bash
 sudo modprobe v4l2loopback video_nr=10 card_label="scrcpy" exclusive_caps=1
