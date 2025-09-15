@@ -1,4 +1,4 @@
-# train_agent.py
+# train.py
 import argparse
 import numpy as np
 from game_car_ai.src.ai.agent import CarAIAgent, train_with_hyperparams

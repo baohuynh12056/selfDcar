@@ -9,6 +9,7 @@ from game_car_ai.src.detection.car_detector import CarDetector
 from game_car_ai.src.controls.input import AndroidController
 from game_car_ai.src.controls.keymap import GameKeyMap, DRIVING_ACTIONS
 from game_car_ai.src.controls.new_input import ScrcpyController
+
 class CarGameEnv(gym.Env):
     def __init__(self, max_opponents=4):
         super(CarGameEnv, self).__init__()
@@ -22,18 +23,22 @@ class CarGameEnv(gym.Env):
         self.controller = AndroidController()
         self.keymap = GameKeyMap(self.controller2) 
         self.game_over = False       
-        # Action space: [trái, phải, xuống, không làm gì]
+
+        # Action space: [left, right, down, no-op]
         self.action_space = spaces.Discrete(len(DRIVING_ACTIONS))
         self.max_opponents = max_opponents        
         self.state_dim = 5 + (self.max_opponents * 5)
+
         # Observation space: preprocessed frame
         self.observation_space = spaces.Box(
             low=0.0, high=1.0,
             shape=(self.state_dim,),
             dtype=np.float32
         )
+
         self.screen_width = 640  
         self.screen_height = 640
+
         # Game state
         self.current_frame = None
         self.last_action = None
@@ -51,14 +56,16 @@ class CarGameEnv(gym.Env):
         time.sleep(0.1)
         observation = self._get_observation()
         
-        # 3. Calculate reward
+        # 2. Calculate reward
         done = self._check_game_over()
         reward = self._calculate_reward(observation,done)
         self.episode_reward += reward
-        # 4. Check termination
+
+        # 3. Check termination
         self.steps += 1
         if self.steps >= self.max_steps:
             done = True
+
         info = {
             'steps': self.steps,
             'total_reward': self.episode_reward,
@@ -73,13 +80,13 @@ class CarGameEnv(gym.Env):
         Convert YOLO detections to feature vector
         Format: [player_features, opp1_features, opp2_features, ...]
         """
-        # Initialize feature vector với zeros
+        # Initialize feature vector with zeros
         features = np.zeros(self.state_dim, dtype=np.float32)
         
         player_features = []
         opponent_features = []
         
-        # Phân loại detections (bỏ qua menu_game)
+        # Classify detections (ignore menu_game)
         for det in detections:
             if det['class_name'] == 'player_car':
                 # Normalize bbox coordinates [0, 1]
@@ -109,7 +116,7 @@ class CarGameEnv(gym.Env):
             features[idx:idx+5] = player_features[:5]
         idx += 5
         
-        # Opponent features (tối đa 4 opponents)
+        # Opponent features (up to 4 opponents)
         for i in range(self.max_opponents):
             if i < len(opponent_features) // 5:
                 start_idx = i * 5
@@ -142,6 +149,7 @@ class CarGameEnv(gym.Env):
         # Restart game
         self._restart_game()
         self.game_over = False
+
         # Get initial observation
         observation = self._get_observation()
         return observation, {}
@@ -149,17 +157,17 @@ class CarGameEnv(gym.Env):
     def _calculate_reward(self, observation, done):
         """
         Calculate reward based on survival and collisions.
-        - done: True nếu game over
-        - observation: vector hiện tại từ YOLO
+        - done: True if game over
+        - observation: current YOLO vector
         """
         if done:
-            return -10.0  # Penalty lớn khi game over
+            return -10.0  # Large penalty when game over
 
-        # Base reward: sống sót
+        # Base reward: survival
         reward = 0.1
 
         # Collision penalty
-        collision_penalty = self._check_collisions(observation)  # trả về 0 hoặc -10
+        collision_penalty = self._check_collisions(observation)  # returns 0 or -10
 
         reward += collision_penalty
         return reward
@@ -167,13 +175,13 @@ class CarGameEnv(gym.Env):
     
     def _check_game_over(self):
         """
-        Check if game over bằng cách detect menu_game
-        Returns: True nếu phát hiện menu_game (game over)
+        Check if game is over by detecting menu_game
+        Returns: True if menu_game is detected (game over)
         """
         if self.current_frame is None:
             return False
         
-        # Get detections từ YOLO
+        # Get detections from YOLO
         detections = self.detector.detect(self.current_frame)
         
         # Check if any detection is menu_game
@@ -184,28 +192,30 @@ class CarGameEnv(gym.Env):
                 return True
         
         return False
+
     def _restart_game(self):
-        """Restart the game khi game over"""
+        """Restart the game when game over"""
         print("🔄 Restarting game...")
         time.sleep(0.3) 
-        # Chỉ restart nếu game over được detect
+        # Only restart if game over was detected
         if self.game_over:
             self.controller.tap(1486, 944) 
-            time.sleep(7.1)
+            time.sleep(3)
         else:
-            # Nếu không phải game over, chỉ reset state
+            # If not game over, just reset state
             print("🔄 Resetting environment state...")
         
         self.game_over = False    
+
     def _line_intersects_bbox(self, line_p1, line_p2, bbox):
         """
-        Kiểm tra xem bbox có va chạm với 1 đoạn thẳng hay không.
+        Check if bbox intersects with a line segment.
         bbox = [xmin, ymin, xmax, ymax]
         line_p1, line_p2 = (x,y)
         """
         xmin, ymin, xmax, ymax = bbox
 
-        # Các đỉnh của bbox
+        # Bbox corners
         corners = [
             (xmin, ymin),  # top-left
             (xmax, ymin),  # top-right
@@ -213,7 +223,7 @@ class CarGameEnv(gym.Env):
             (xmin, ymax)   # bottom-left
         ]
 
-        # Hàm phụ: check 1 điểm có nằm trên đoạn thẳng hay không
+        # Helper: check if a point lies on a segment
         def point_on_segment(p, a, b, eps=1e-6):
             cross = (p[1]-a[1])*(b[0]-a[0]) - (p[0]-a[0])*(b[1]-a[1])
             if abs(cross) > eps:
@@ -226,12 +236,12 @@ class CarGameEnv(gym.Env):
                 return False
             return True
 
-        # 1. Nếu góc nào của bbox nằm trên lan can
+        # 1. If any corner of bbox lies on the guardrail
         for c in corners:
             if point_on_segment(c, line_p1, line_p2):
                 return True
 
-        # 2. Nếu lan can cắt bất kỳ cạnh nào của bbox
+        # 2. If guardrail intersects any edge of bbox
         edges = [
             ((xmin, ymin), (xmax, ymin)),  # top
             ((xmax, ymin), (xmax, ymax)),  # right
@@ -261,25 +271,30 @@ class CarGameEnv(gym.Env):
         
         # Player bounding box
         player_bbox = [player_x, player_y, player_x + player_w, player_y + player_h]
-        # Check collision với each opponent
+
+        # Check collision with each opponent
         for i in range(self.max_opponents):
             opp_idx = 5 + i * 5
-            if np.any(observation[opp_idx:opp_idx+4] > 0):  # Có opponent
+            if np.any(observation[opp_idx:opp_idx+4] > 0):  # has opponent
                 opp_x, opp_y, opp_w, opp_h, opp_conf = observation[opp_idx:opp_idx+5]
                 opp_bbox = [opp_x, opp_y, opp_x + opp_w, opp_y + opp_h]
                 
                 if self._bbox_iou(player_bbox, opp_bbox) > 0.0:
                     return -10.0  # Collision penalty
-                
-        lan_can_p1_1 = (134/640.0, 389/640.0)
-        lan_can_p2_1 = (84/640.0, 551/640.0)
-        lan_can_p1_2 = (513/640.0, 374/640.0)
-        lan_can_p2_2 = (579/640.0, 549/640.0)
-        if self._line_intersects_bbox(lan_can_p1_1, lan_can_p2_1, player_bbox) or self._line_intersects_bbox(lan_can_p1_2, lan_can_p2_2, player_bbox):
+       
+        # Coordinates (normalized by image width = 640) of the guardrails
+        # Left guardrail
+        Left_guardrail_1 = (134/640.0, 389/640.0)
+        Left_guardrail_2 = (84/640.0, 551/640.0)
+        # Right guardrail
+        Right_guardrail_1 = (513/640.0, 374/640.0)
+        Right_guardrail_2 = (579/640.0, 549/640.0)
+
+        if self._line_intersects_bbox(Left_guardrail_1, Left_guardrail_2, player_bbox) or self._line_intersects_bbox(Right_guardrail_1, Right_guardrail_2, player_bbox):
             return -5
 
-
         return 0.0  # No collision
+
     def _bbox_iou(self, bbox1, bbox2):
         """Calculate Intersection over Union of two normalized bboxes"""
         x1_1, y1_1, x2_1, y2_1 = bbox1
@@ -305,7 +320,7 @@ class CarGameEnv(gym.Env):
                 detections = self.detector.detect(self.current_frame)
                 frame_viz = self.detector.visualize(self.current_frame, detections)
 
-                # Thông tin cơ bản
+                # Basic information
                 cv2.putText(frame_viz, f"Steps: {self.steps}", (10, 30), 
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
                 cv2.putText(frame_viz, f"Reward: {self.episode_reward:.2f}", (10, 60), 
@@ -313,7 +328,7 @@ class CarGameEnv(gym.Env):
                 cv2.putText(frame_viz, f"Game Over: {self.game_over}", (10, 90), 
                         cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
 
-                # Hiển thị action cuối cùng
+                # Display last action
                 action_map = {0: "LEFT", 1: "RIGHT", 2: "DOWN", 3: "NOOP"}
                 if hasattr(self, "last_action"):
                     action_name = action_map.get(self.last_action, "UNKNOWN")
@@ -328,6 +343,7 @@ class CarGameEnv(gym.Env):
 
                 cv2.imshow('Car Game Environment', frame_viz)
                 cv2.waitKey(1)
+
     def close(self):
         """Cleanup environment resources"""
         print("🧹 Cleaning up CarGameEnv...")
@@ -340,11 +356,11 @@ class CarGameEnv(gym.Env):
             try:
                 self.controller.close()
             except AttributeError:
-                # Nếu AndroidController chưa có close() thì bỏ qua
                 pass
             self.controller = None
         
         cv2.destroyAllWindows()
+
 def test_yolo_env():
     env = CarGameEnv()
     

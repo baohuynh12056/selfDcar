@@ -19,9 +19,7 @@ class SaveBestModelCallback(BaseCallback):
         os.makedirs(save_path, exist_ok=True)
 
     def _on_step(self) -> bool:
-        # Kiểm tra ep_info_buffer có dữ liệu
         if len(self.model.ep_info_buffer) > 0:
-            # Lấy reward của episode gần nhất
             ep_info = self.model.ep_info_buffer[-1]
             if 'r' in ep_info:
                 mean_reward = ep_info['r']
@@ -118,7 +116,6 @@ class CarAIAgent:
         """Load trained agent"""
         if self.env is None:
             self.env = self.create_env()
-        print(2)
         self.model = PPO.load(path, env=env)
         print(f"Loaded agent from {path}")
         return self.model
